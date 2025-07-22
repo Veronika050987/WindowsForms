@@ -190,5 +190,10 @@ namespace WindowsForms_1
 		{
 
 		}
+
+		private void MainForm_Resize(object sender, EventArgs e)
+		{
+			UpdateTimeLabelLocation();
+		}
 	}
 }

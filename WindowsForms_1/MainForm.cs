@@ -21,6 +21,8 @@ namespace WindowsForms_1
 		{
 			InitializeComponent();
 			ShowControls(cmShowControls.Checked);
+
+			UpdateTimeLabelLocation();
 		}
 
 		void ShowControls(bool visible)
@@ -111,6 +113,35 @@ namespace WindowsForms_1
 					// Handle potential IO exception
 				}
 			}
+		}
+
+		private void UpdateDateTimeLabels()
+		{
+			// Always update current time
+			labelCurrentTime.Text = DateTime.Now.ToString("HH:mm:ss");
+
+			// Update date if checkbox is checked
+			cbShowDate.Visible = cbShowDate.Checked;
+			cbShowDate.Text = cbShowDate.Checked ? DateTime.Now.ToString("yyyy.MM.dd") : "";
+
+			// Update weekday if checkbox is checked
+			cbShowWeekDay.Visible = cbShowWeekDay.Checked;
+			cbShowWeekDay.Text = cbShowWeekDay.Checked ? DateTime.Now.DayOfWeek.ToString() : "";
+
+			// Adjust label positions
+			cbShowDate.Location = new Point(labelCurrentTime.Left, labelCurrentTime.Bottom);
+			cbShowWeekDay.Location = new Point(labelCurrentTime.Left, cbShowDate.Checked ? 
+				cbShowDate.Bottom : labelCurrentTime.Bottom);
+		}
+
+
+		private void UpdateTimeLabelLocation()
+		{
+			int x = this.ClientSize.Width - labelCurrentTime.Width - 10;  // 10 pixels from the right edge
+			int y = 10;  // 10 pixels from the top edge
+
+			// Update the location
+			labelCurrentTime.Location = new Point(x, y);
 		}
 
 		private void btnHideControls_Click(object sender, EventArgs e)

@@ -8,11 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.IO; // for StreamWriter
 
 namespace WindowsForms_1
 {
 	public partial class MainForm : Form
 	{
+		private bool consoleAllocated = false; // flag for console
+		private StreamWriter consoleWriter = null; // to add StreamWriter
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -20,11 +24,11 @@ namespace WindowsForms_1
 		}
 
 		void ShowControls(bool visible)
-		{			
+		{
 			cbShowDate.Visible = visible;
 			cbShowWeekDay.Visible = visible;
 			btnHideControls.Visible = visible;
-			this.ShowInTaskbar = visible;		
+			this.ShowInTaskbar = visible;
 			this.TransparencyKey = visible ? Color.Empty : this.BackColor;
 			this.FormBorderStyle = visible ? FormBorderStyle.FixedDialog : FormBorderStyle.None;
 			this.labelCurrentTime.BackColor = visible ? this.BackColor : Color.DeepSkyBlue;
@@ -32,24 +36,81 @@ namespace WindowsForms_1
 
 		void ShowConsole(bool visible)
 		{
-			if (visible)
-				AllocConsole();
-			else
-				FreeConsole();
-			//bool console = visible ? AllocConsole() : FreeConsole();
-			//if(console)Console.WriteLine(console);
+			try
+			{
+				if (visible && !consoleAllocated)
+				{
+					consoleAllocated = AllocConsole();
+					if (!consoleAllocated)
+					{
+						MessageBox.Show("Failed to allocate console!", "Error", 
+							MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return; // exit if console is not given
+					}
+
+					try
+					{
+						// StreamWriter initialisation after AllocConsole
+						consoleWriter = new StreamWriter(Console.OpenStandardOutput());
+						consoleWriter.AutoFlush = true; // Attention!
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show($"Failed to create StreamWriter: {ex.Message}", "Error", 
+							MessageBoxButtons.OK, MessageBoxIcon.Error);
+						FreeConsole();
+						consoleAllocated = false;
+						return;
+					}
+				}
+				else if (!visible && consoleAllocated)
+				{
+					if (consoleWriter != null)
+					{
+						consoleWriter.Close();
+						consoleWriter = null;
+					}
+
+					bool freed = FreeConsole();
+					if (freed)
+					{
+						consoleAllocated = false;
+					}
+					else
+					{
+						MessageBox.Show("Failed to free console!", "Error", MessageBoxButtons.OK, 
+							MessageBoxIcon.Error);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Error showing/hiding console: {ex.Message}", "Error", 
+					MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
 		}
 
 		private void timer_Tick(object sender, EventArgs e)
 		{
 			labelCurrentTime.Text = DateTime.Now.ToString("HH:mm:ss");
-			if(cbShowDate.Checked)
+			if (cbShowDate.Checked)
 				labelCurrentTime.Text += $"\n{DateTime.Now.ToString("yyyy.MM.dd")}";
 			if (cbShowWeekDay.Checked)
 				labelCurrentTime.Text += $"\n{DateTime.Now.DayOfWeek}";
 			notifyIcon.Text = labelCurrentTime.Text;
-			if(cmDebugConsole.Checked)
-			Console.WriteLine(notifyIcon.Text);
+
+			if (cmDebugConsole.Checked && consoleAllocated && consoleWriter != null)
+			{
+				try
+				{
+					consoleWriter.WriteLine(notifyIcon.Text); // using StreamWriter
+				}
+				catch (IOException ex)
+				{
+					Console.Error.WriteLine($"Error writing to console: {ex.Message}"); 
+					// Handle potential IO exception
+				}
+			}
 		}
 
 		private void btnHideControls_Click(object sender, EventArgs e)
@@ -92,6 +153,11 @@ namespace WindowsForms_1
 			if (this.TopMost) return;
 			this.TopMost = true;
 			this.TopMost = false;
+		}
+
+		private void MainForm_Load(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

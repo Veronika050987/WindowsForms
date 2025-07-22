@@ -16,12 +16,21 @@ namespace WindowsForms_1
 	{
 		private bool consoleAllocated = false; // flag for console
 		private StreamWriter consoleWriter = null; // to add StreamWriter
+		private Font currentTimeFont = new Font("Microsoft Sans Serif", 32);
+		//private FontDialog fontDialog = new FontDialog(); // FontDialog
+
+		private Color currentTimeTextColor = Color.Black; // Default text color
+		private Color currentTimeBackColor = Color.Empty; // Default background color (transparent if FormBorderStyle is None)
+		private Image currentTimeBackgroundImage = null; // Add image background
+		private ColorDialog colorDialog = new ColorDialog(); // ColorDialog
+
+		private OpenFileDialog imageFileDialog = new OpenFileDialog();
 
 		public MainForm()
 		{
 			InitializeComponent();
 			ShowControls(cmShowControls.Checked);
-
+			labelCurrentTime.Font = currentTimeFont; // Apply default font
 			UpdateTimeLabelLocation();
 		}
 
@@ -194,6 +203,17 @@ namespace WindowsForms_1
 		private void MainForm_Resize(object sender, EventArgs e)
 		{
 			UpdateTimeLabelLocation();
+		}
+
+		private void cmFont_DoubleClick(object sender, EventArgs e)
+		{
+			fontDialog.Font = currentTimeFont; //Set a default font from currentTimeFont
+			if (fontDialog.ShowDialog() == DialogResult.OK)
+			{
+				currentTimeFont = fontDialog.Font;
+				labelCurrentTime.Font = currentTimeFont; //Apply font to label
+				UpdateTimeLabelLocation(); //Update labels position after font changed
+			}
 		}
 	}
 }

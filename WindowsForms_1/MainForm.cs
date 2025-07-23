@@ -16,21 +16,16 @@ namespace WindowsForms_1
 	{
 		private bool consoleAllocated = false; // flag for console
 		private StreamWriter consoleWriter = null; // to add StreamWriter
-		private Font currentTimeFont = new Font("Microsoft Sans Serif", 32);
-		//private FontDialog fontDialog = new FontDialog(); // FontDialog
-
-		private Color currentTimeTextColor = Color.Black; // Default text color
-		private Color currentTimeBackColor = Color.Empty; // Default background color (transparent if FormBorderStyle is None)
-		private Image currentTimeBackgroundImage = null; // Add image background
-		private ColorDialog colorDialog = new ColorDialog(); // ColorDialog
-
-		private OpenFileDialog imageFileDialog = new OpenFileDialog();
+		ColorDialog cdBackColor;
+		ColorDialog cdForeColor;
 
 		public MainForm()
 		{
 			InitializeComponent();
 			ShowControls(cmShowControls.Checked);
-			labelCurrentTime.Font = currentTimeFont; // Apply default font
+			cdBackColor = new ColorDialog();
+			cdForeColor = new ColorDialog();
+
 			UpdateTimeLabelLocation();
 		}
 
@@ -205,15 +200,27 @@ namespace WindowsForms_1
 			UpdateTimeLabelLocation();
 		}
 
-		private void cmFont_DoubleClick(object sender, EventArgs e)
+		private void cmShowDate_CheckedChanged(object sender, EventArgs e)
 		{
-			fontDialog.Font = currentTimeFont; //Set a default font from currentTimeFont
-			if (fontDialog.ShowDialog() == DialogResult.OK)
-			{
-				currentTimeFont = fontDialog.Font;
-				labelCurrentTime.Font = currentTimeFont; //Apply font to label
-				UpdateTimeLabelLocation(); //Update labels position after font changed
-			}
+			cbShowDate.Checked = cmShowDate.Checked;
+		}
+
+		private void cmShowWeekday_CheckedChanged(object sender, EventArgs e)
+		{
+			cbShowWeekDay.Checked = cmShowWeekday.Checked;
+		}
+
+		private void cmBackColor_Click(object sender, EventArgs e)
+		{
+			cdBackColor.ShowDialog();//Method always opens modal dyalog window
+								     //if (cdBackColor.ShowDialog()==DialogResult.OK)			
+			labelCurrentTime.BackColor = cdBackColor.Color;
+		}
+
+		private void cmForeColor_Click(object sender, EventArgs e)
+		{
+			cdForeColor.ShowDialog();
+			labelCurrentTime.ForeColor = cdForeColor.Color;
 		}
 	}
 }

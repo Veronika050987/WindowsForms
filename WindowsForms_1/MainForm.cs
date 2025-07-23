@@ -16,6 +16,7 @@ namespace WindowsForms_1
 	{
 		private bool consoleAllocated = false; // flag for console
 		private StreamWriter consoleWriter = null; // to add StreamWriter
+		ChooseFont chooseFont;
 		ColorDialog cdBackColor;
 		ColorDialog cdForeColor;
 
@@ -23,6 +24,8 @@ namespace WindowsForms_1
 		{
 			InitializeComponent();
 			ShowControls(cmShowControls.Checked);
+			ShowConsole(cmDebugConsole.Checked = true);
+			chooseFont = new ChooseFont();
 			cdBackColor = new ColorDialog();
 			cdForeColor = new ColorDialog();
 
@@ -105,18 +108,18 @@ namespace WindowsForms_1
 				labelCurrentTime.Text += $"\n{DateTime.Now.DayOfWeek}";
 			notifyIcon.Text = labelCurrentTime.Text;
 
-			if (cmDebugConsole.Checked && consoleAllocated && consoleWriter != null)
-			{
-				try
-				{
-					consoleWriter.WriteLine(notifyIcon.Text); // using StreamWriter
-				}
-				catch (IOException ex)
-				{
-					Console.Error.WriteLine($"Error writing to console: {ex.Message}"); 
-					// Handle potential IO exception
-				}
-			}
+			//if (cmDebugConsole.Checked && consoleAllocated && consoleWriter != null)
+			//{
+			//	try
+			//	{
+			//		consoleWriter.WriteLine(notifyIcon.Text); // using StreamWriter
+			//	}
+			//	catch (IOException ex)
+			//	{
+			//		Console.Error.WriteLine($"Error writing to console: {ex.Message}"); 
+			//		// Handle potential IO exception
+			//	}
+			//}
 		}
 
 		private void UpdateDateTimeLabels()
@@ -221,6 +224,12 @@ namespace WindowsForms_1
 		{
 			cdForeColor.ShowDialog();
 			labelCurrentTime.ForeColor = cdForeColor.Color;
+		}
+
+		private void cmFont_Click(object sender, EventArgs e)
+		{
+			chooseFont.ShowDialog();
+			labelCurrentTime.Font = chooseFont.Font;
 		}
 	}
 }

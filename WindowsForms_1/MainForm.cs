@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO; // for StreamWriter
+using Microsoft.Win32;// for adding "Load during Windows start"
 
 namespace WindowsForms_1
 {
@@ -30,6 +31,44 @@ namespace WindowsForms_1
 			cdForeColor = new ColorDialog();
 
 			UpdateTimeLabelLocation();
+
+			cmStartup.Checked = IsStartupEnabled();
+		}
+
+		// Helper method to check if startup is enabled
+		private bool IsStartupEnabled()
+		{
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");
+			if (key == null)
+				return false;
+
+			string value = (string)key.GetValue(Application.ProductName);
+			if (value == null)
+				return false;
+
+			return (value == Application.ExecutablePath.ToString());
+		}
+
+		// Helper method to enable/disable startup
+		private void SetStartupEnabled(bool enabled)
+		{
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+			if (enabled)
+			{
+				key.SetValue(Application.ProductName, Application.ExecutablePath.ToString());
+			}
+			else
+			{
+				key.DeleteValue(Application.ProductName, false);
+			}
+		}
+
+		// Event Handler
+		private void cmStartup_Click(object sender, EventArgs e)
+		{
+			cmStartup.Checked = !cmStartup.Checked; // Toggle checked state
+			SetStartupEnabled(cmStartup.Checked); // Enable or Disable startup depending on checkbox value
 		}
 
 		void ShowControls(bool visible)
@@ -229,11 +268,17 @@ namespace WindowsForms_1
 		private void cmFont_Click(object sender, EventArgs e)
 		{
 			Point location = labelCurrentTime.PointToScreen(new Point(0, labelCurrentTime.Height));
+			//position near clock
 			chooseFont.StartPosition = FormStartPosition.Manual;
 			chooseFont.Location = location;
 
 			chooseFont.ShowDialog();
 			labelCurrentTime.Font = chooseFont.Font;
+		}
+
+		private void cmMainMenu_Opening(object sender, CancelEventArgs e)
+		{
+
 		}
 	}
 }

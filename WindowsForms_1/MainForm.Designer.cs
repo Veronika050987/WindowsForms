@@ -82,7 +82,7 @@
             this.toolStripSeparator3,
             this.cmClose});
 			this.cmMainMenu.Name = "cmMainMenu";
-			this.cmMainMenu.Size = new System.Drawing.Size(211, 266);
+			this.cmMainMenu.Size = new System.Drawing.Size(196, 238);
 			// 
 			// cmTopmost
 			// 
@@ -226,6 +226,7 @@
 			this.Controls.Add(this.cbShowDate);
 			this.Controls.Add(this.labelCurrentTime);
 			this.DoubleBuffered = true;
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainForm";
 			this.Text = "Clock";

@@ -17,10 +17,22 @@ namespace WindowsForms_1
 		public Font Font { get; set; }
 		public ChooseFont()
 		{
-			InitializeComponent();	
-			comboBoxChooseFont.Items.AddRange(GetFontListFromCurrentDirectoryByExtension("*.ttf"));
-			comboBoxChooseFont.Items.AddRange(GetFontListFromCurrentDirectoryByExtension("*.otf"));
-			comboBoxChooseFont.SelectedIndex = 0;
+			InitializeComponent();
+
+			List<string> fontList = new List<string>();
+
+			fontList.AddRange(GetFontListFromCurrentDirectoryByExtension("*.ttf"));
+			fontList.AddRange(GetFontListFromCurrentDirectoryByExtension("*.otf"));
+
+			fontList.Sort();
+
+			comboBoxChooseFont.Items.AddRange(fontList.ToArray());
+
+			if (comboBoxChooseFont.Items.Count > 0)
+				comboBoxChooseFont.SelectedIndex = 0;
+			//comboBoxChooseFont.Items.AddRange(GetFontListFromCurrentDirectoryByExtension("*.ttf"));
+			//comboBoxChooseFont.Items.AddRange(GetFontListFromCurrentDirectoryByExtension("*.otf"));
+			//comboBoxChooseFont.SelectedIndex = 0;
 		}
 		string[] GetFontListFromCurrentDirectoryByExtension(string extension)
 		{

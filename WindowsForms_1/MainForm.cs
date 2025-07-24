@@ -228,6 +228,10 @@ namespace WindowsForms_1
 
 		private void cmFont_Click(object sender, EventArgs e)
 		{
+			Point location = labelCurrentTime.PointToScreen(new Point(0, labelCurrentTime.Height));
+			chooseFont.StartPosition = FormStartPosition.Manual;
+			chooseFont.Location = location;
+
 			chooseFont.ShowDialog();
 			labelCurrentTime.Font = chooseFont.Font;
 		}

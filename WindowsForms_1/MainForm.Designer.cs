@@ -32,6 +32,7 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.labelCurrentTime = new System.Windows.Forms.Label();
 			this.cmMainMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.cmStartup = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmTopmost = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmShowControls = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmDebugConsole = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +45,6 @@
 			this.cmForeColor = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.cmClose = new System.Windows.Forms.ToolStripMenuItem();
-			this.cmStartup = new System.Windows.Forms.ToolStripMenuItem();
 			this.timer = new System.Windows.Forms.Timer(this.components);
 			this.cbShowDate = new System.Windows.Forms.CheckBox();
 			this.cbShowWeekDay = new System.Windows.Forms.CheckBox();
@@ -84,8 +84,15 @@
             this.toolStripSeparator3,
             this.cmClose});
 			this.cmMainMenu.Name = "cmMainMenu";
-			this.cmMainMenu.Size = new System.Drawing.Size(215, 290);
-			this.cmMainMenu.Opening += new System.ComponentModel.CancelEventHandler(this.cmMainMenu_Opening);
+			this.cmMainMenu.Size = new System.Drawing.Size(215, 262);
+			// 
+			// cmStartup
+			// 
+			this.cmStartup.CheckOnClick = true;
+			this.cmStartup.Name = "cmStartup";
+			this.cmStartup.Size = new System.Drawing.Size(214, 24);
+			this.cmStartup.Text = "Load on WinStartup ";
+			this.cmStartup.CheckedChanged += new System.EventHandler(this.cmStartup_CheckedChanged);
 			// 
 			// cmTopmost
 			// 
@@ -172,13 +179,6 @@
 			this.cmClose.Text = "Close";
 			this.cmClose.Click += new System.EventHandler(this.cmClose_Click);
 			// 
-			// cmStartup
-			// 
-			this.cmStartup.CheckOnClick = true;
-			this.cmStartup.Name = "cmStartup";
-			this.cmStartup.Size = new System.Drawing.Size(214, 24);
-			this.cmStartup.Text = "Load on WinStartup ";
-			// 
 			// timer
 			// 
 			this.timer.Enabled = true;
@@ -240,6 +240,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainForm";
 			this.Text = "Clock";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.cmMainMenu.ResumeLayout(false);
 			this.ResumeLayout(false);

@@ -15,8 +15,8 @@ namespace WindowsForms_1
 {
 	public partial class MainForm : Form
 	{
-		private bool consoleAllocated = false; // flag for console
-		private StreamWriter consoleWriter = null; // to add StreamWriter
+		//private bool consoleAllocated = false; // flag for console
+		//private StreamWriter consoleWriter = null; // to add StreamWriter
 		ChooseFont chooseFont;
 		ColorDialog cdBackColor;
 		ColorDialog cdForeColor;
@@ -29,53 +29,19 @@ namespace WindowsForms_1
 			chooseFont = new ChooseFont();
 			cdBackColor = new ColorDialog();
 			cdForeColor = new ColorDialog();
-
+			this.Location = new Point
+				(
+					Screen.PrimaryScreen.Bounds.Width - this.Width,
+					100
+				);
 			chooseFont.StartPosition = FormStartPosition.Manual;
 			chooseFont.Location = new Point
 				(
 					this.Location.X - chooseFont.Width,
 					100
 				);
-
-			UpdateTimeLabelLocation();
-
-			cmStartup.Checked = IsStartupEnabled();
-		}
-
-		// Helper method to check if startup is enabled
-		private bool IsStartupEnabled()
-		{
-			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");
-			if (key == null)
-				return false;
-
-			string value = (string)key.GetValue(Application.ProductName);
-			if (value == null)
-				return false;
-
-			return (value == Application.ExecutablePath.ToString());
-		}
-
-		// Helper method to enable/disable startup
-		private void SetStartupEnabled(bool enabled)
-		{
-			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-
-			if (enabled)
-			{
-				key.SetValue(Application.ProductName, Application.ExecutablePath.ToString());
-			}
-			else
-			{
-				key.DeleteValue(Application.ProductName, false);
-			}
-		}
-
-		// Event Handler
-		private void cmStartup_Click(object sender, EventArgs e)
-		{
-			cmStartup.Checked = !cmStartup.Checked; // Toggle checked state
-			SetStartupEnabled(cmStartup.Checked); // Enable or Disable startup depending on checkbox value
+			UpdateDateTimeLabels();
+			LoadSettings();
 		}
 
 		void ShowControls(bool visible)
@@ -89,60 +55,112 @@ namespace WindowsForms_1
 			this.labelCurrentTime.BackColor = visible ? this.BackColor : Color.DeepSkyBlue;
 		}
 
+		//void ShowConsole(bool visible)
+		//{
+		//	try
+		//	{
+		//		if (visible && !consoleAllocated)
+		//		{
+		//			consoleAllocated = AllocConsole();
+		//			if (!consoleAllocated)
+		//			{
+		//				MessageBox.Show("Failed to allocate console!", "Error", 
+		//					MessageBoxButtons.OK, MessageBoxIcon.Error);
+		//				return; // exit if console is not given
+		//			}
+
+		//			try
+		//			{
+		//				// StreamWriter initialisation after AllocConsole
+		//				consoleWriter = new StreamWriter(Console.OpenStandardOutput());
+		//				consoleWriter.AutoFlush = true; // Attention!
+		//			}
+		//			catch (Exception ex)
+		//			{
+		//				MessageBox.Show($"Failed to create StreamWriter: {ex.Message}", "Error", 
+		//					MessageBoxButtons.OK, MessageBoxIcon.Error);
+		//				FreeConsole();
+		//				consoleAllocated = false;
+		//				return;
+		//			}
+		//		}
+		//		else if (!visible && consoleAllocated)
+		//		{
+		//			if (consoleWriter != null)
+		//			{
+		//				consoleWriter.Close();
+		//				consoleWriter = null;
+		//			}
+
+		//			bool freed = FreeConsole();
+		//			if (freed)
+		//			{
+		//				consoleAllocated = false;
+		//			}
+		//			else
+		//			{
+		//				MessageBox.Show("Failed to free console!", "Error", MessageBoxButtons.OK, 
+		//					MessageBoxIcon.Error);
+		//			}
+		//		}
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		MessageBox.Show($"Error showing/hiding console: {ex.Message}", "Error", 
+		//			MessageBoxButtons.OK, MessageBoxIcon.Error);
+		//	}
+		//}
+
 		void ShowConsole(bool visible)
 		{
-			try
-			{
-				if (visible && !consoleAllocated)
-				{
-					consoleAllocated = AllocConsole();
-					if (!consoleAllocated)
-					{
-						MessageBox.Show("Failed to allocate console!", "Error", 
-							MessageBoxButtons.OK, MessageBoxIcon.Error);
-						return; // exit if console is not given
-					}
+			//bool console = visible ? AllocConsole() : FreeConsole();
+			//if(console)Console.WriteLine(console);
+			if (visible)
+				AllocConsole();
+			else
+				FreeConsole();
+		}
 
-					try
-					{
-						// StreamWriter initialisation after AllocConsole
-						consoleWriter = new StreamWriter(Console.OpenStandardOutput());
-						consoleWriter.AutoFlush = true; // Attention!
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show($"Failed to create StreamWriter: {ex.Message}", "Error", 
-							MessageBoxButtons.OK, MessageBoxIcon.Error);
-						FreeConsole();
-						consoleAllocated = false;
-						return;
-					}
-				}
-				else if (!visible && consoleAllocated)
-				{
-					if (consoleWriter != null)
-					{
-						consoleWriter.Close();
-						consoleWriter = null;
-					}
+		void SaveSettings()
+		{
+			StreamWriter settings = new StreamWriter("Settings.ini");
 
-					bool freed = FreeConsole();
-					if (freed)
-					{
-						consoleAllocated = false;
-					}
-					else
-					{
-						MessageBox.Show("Failed to free console!", "Error", MessageBoxButtons.OK, 
-							MessageBoxIcon.Error);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show($"Error showing/hiding console: {ex.Message}", "Error", 
-					MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
+			settings.WriteLine($"{this.Location.X}x{this.Location.Y}"); //1. Location
+			settings.WriteLine(cmTopmost.Checked);      //2.
+			settings.WriteLine(cmShowControls.Checked); //3.
+			settings.WriteLine(cmDebugConsole.Checked); //4.
+			settings.WriteLine(cmShowDate.Checked);     //5.
+			settings.WriteLine(cmShowWeekday.Checked);  //6.
+			settings.WriteLine(cmStartup.Checked);//7.
+			settings.WriteLine(cdBackColor.Color.ToArgb()); //8.
+			settings.WriteLine(cdForeColor.Color.ToArgb()); //9.
+			settings.WriteLine(chooseFont.Filename);    //10.
+			settings.Close();
+		}
+
+		void LoadSettings()
+		{
+			StreamReader settings = new StreamReader("Settings.ini");
+			
+			string location = settings.ReadLine();  //1.Location
+			this.Location = new Point
+				(
+					Convert.ToInt32(location.Split('x').First()),
+					Convert.ToInt32(location.Split('x').Last())
+				);
+
+			cmTopmost.Checked = bool.Parse(settings.ReadLine());        //2.
+			cmShowControls.Checked = bool.Parse(settings.ReadLine());   //3.
+			cmDebugConsole.Checked = bool.Parse(settings.ReadLine());   //4.
+			cmShowDate.Checked = bool.Parse(settings.ReadLine());       //5.
+			cmShowWeekday.Checked = bool.Parse(settings.ReadLine());    //6.
+			cmStartup.Checked = bool.Parse(settings.ReadLine());//7.
+			cdBackColor.Color = labelCurrentTime.BackColor = Color.FromArgb(Convert.ToInt32(settings.ReadLine()));//8.
+			cdForeColor.Color = labelCurrentTime.ForeColor = Color.FromArgb(Convert.ToInt32(settings.ReadLine()));//9.
+			string font_name = settings.ReadLine();                     //10.			
+			chooseFont = new ChooseFont(this, font_name, 32);
+			labelCurrentTime.Font = chooseFont.Font;						
+			settings.Close();
 		}
 
 		private void timer_Tick(object sender, EventArgs e)
@@ -261,18 +279,27 @@ namespace WindowsForms_1
 
 		private void cmFont_Click(object sender, EventArgs e)
 		{
-			Point location = labelCurrentTime.PointToScreen(new Point(0, labelCurrentTime.Height));
-			//position near clock
-			chooseFont.StartPosition = FormStartPosition.Manual;
-			chooseFont.Location = location;
-
+			chooseFont.Location = new Point
+				(
+					this.Location.X - chooseFont.Width,
+					this.Location.Y
+				);
 			chooseFont.ShowDialog();
 			labelCurrentTime.Font = chooseFont.Font;
 		}
 
-		private void cmMainMenu_Opening(object sender, CancelEventArgs e)
+		private void cmStartup_CheckedChanged(object sender, EventArgs e)
 		{
+			string key_name = "Clock_PD_411";
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);   //true - открывает ветку на запись
+			if (cmStartup.Checked) key.SetValue(key_name, Application.ExecutablePath);
+			else key.DeleteValue(key_name, false);  //false - НЕ бросать исключение при отсутствии ключа.
+			key.Dispose();
+		}
 
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			SaveSettings();
 		}
 	}
 }

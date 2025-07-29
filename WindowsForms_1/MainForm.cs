@@ -30,6 +30,13 @@ namespace WindowsForms_1
 			cdBackColor = new ColorDialog();
 			cdForeColor = new ColorDialog();
 
+			chooseFont.StartPosition = FormStartPosition.Manual;
+			chooseFont.Location = new Point
+				(
+					this.Location.X - chooseFont.Width,
+					100
+				);
+
 			UpdateTimeLabelLocation();
 
 			cmStartup.Checked = IsStartupEnabled();
@@ -147,18 +154,6 @@ namespace WindowsForms_1
 				labelCurrentTime.Text += $"\n{DateTime.Now.DayOfWeek}";
 			notifyIcon.Text = labelCurrentTime.Text;
 
-			//if (cmDebugConsole.Checked && consoleAllocated && consoleWriter != null)
-			//{
-			//	try
-			//	{
-			//		consoleWriter.WriteLine(notifyIcon.Text); // using StreamWriter
-			//	}
-			//	catch (IOException ex)
-			//	{
-			//		Console.Error.WriteLine($"Error writing to console: {ex.Message}"); 
-			//		// Handle potential IO exception
-			//	}
-			//}
 		}
 
 		private void UpdateDateTimeLabels()
@@ -179,7 +174,6 @@ namespace WindowsForms_1
 			cbShowWeekDay.Location = new Point(labelCurrentTime.Left, cbShowDate.Checked ? 
 				cbShowDate.Bottom : labelCurrentTime.Bottom);
 		}
-
 
 		private void UpdateTimeLabelLocation()
 		{

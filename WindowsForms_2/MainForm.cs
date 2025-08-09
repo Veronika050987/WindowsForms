@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO;
+using Microsoft.Win32;
 
 namespace WindowsForms_2
 {
@@ -152,6 +153,15 @@ namespace WindowsForms_2
 			);
 			chooseFont.ShowDialog();
 			labelCurrentTime.Font = chooseFont.Font;
+		}
+
+		private void cmLoadOnWindowsStartup_CheckedChanged(object sender, EventArgs e)
+		{
+			string key_name = "Clock_PD411";
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);//opens brahcn for writing
+			if (cmLoadOnWindowsStartup.Checked) key.SetValue(key_name, Application.ExecutablePath);
+			else key.DeleteValue(key_name, false);//no exeptions if there is no key
+			key.Dispose();
 		}
 	}
 }

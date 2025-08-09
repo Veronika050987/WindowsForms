@@ -33,6 +33,7 @@
 			this.labelCurrentTime = new System.Windows.Forms.Label();
 			this.cmMainMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.cmStartup = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
 			this.cmTopmost = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmShowControls = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmDebugConsole = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,6 +72,7 @@
 			this.cmMainMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
 			this.cmMainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cmStartup,
+            this.toolStripSeparator4,
             this.cmTopmost,
             this.cmShowControls,
             this.cmDebugConsole,
@@ -84,7 +86,7 @@
             this.toolStripSeparator3,
             this.cmClose});
 			this.cmMainMenu.Name = "cmMainMenu";
-			this.cmMainMenu.Size = new System.Drawing.Size(215, 262);
+			this.cmMainMenu.Size = new System.Drawing.Size(215, 296);
 			// 
 			// cmStartup
 			// 
@@ -93,6 +95,11 @@
 			this.cmStartup.Size = new System.Drawing.Size(214, 24);
 			this.cmStartup.Text = "Load on WinStartup ";
 			this.cmStartup.CheckedChanged += new System.EventHandler(this.cmStartup_CheckedChanged);
+			// 
+			// toolStripSeparator4
+			// 
+			this.toolStripSeparator4.Name = "toolStripSeparator4";
+			this.toolStripSeparator4.Size = new System.Drawing.Size(211, 6);
 			// 
 			// cmTopmost
 			// 
@@ -270,6 +277,7 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripMenuItem cmClose;
 		private System.Windows.Forms.ToolStripMenuItem cmStartup;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 	}
 }
 

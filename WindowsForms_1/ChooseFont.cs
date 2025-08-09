@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +14,7 @@ namespace WindowsForms_1
 {
 	public partial class ChooseFont : Form
 	{
-		public Font Font { get; set; }
+		public override Font Font { get; set; }
 		public string Filename { get; set; }
 		public ChooseFont()
 		{
@@ -83,5 +83,10 @@ namespace WindowsForms_1
 			SetFont(comboBoxChooseFont.SelectedItem.ToString(), (float)nudFontSize.Value);
 			//lblExample.Font.Size = (float)(sender as NumericUpDown).Value;
 		}
+
+		//private void ChooseFont_Load(object sender, EventArgs e)
+		//{
+
+		//}
 	}
 }

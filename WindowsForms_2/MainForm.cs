@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.IO;
 using Microsoft.Win32;
+using System.Media;  // For sound playback
 
 namespace WindowsForms_2
 {

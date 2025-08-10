@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Media;  // For sound playback
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.IO;
-using Microsoft.Win32;
-using System.Media;  // For sound playback
 
 namespace WindowsForms_2
 {
@@ -20,6 +20,8 @@ namespace WindowsForms_2
 		ChooseFont chooseFont;
 		ColorDialog cdBackColor;
 		ColorDialog cdForeColor;
+
+		private AlarmsForm alarmsForm;
 
 		public MainForm()
 		{
@@ -40,7 +42,68 @@ namespace WindowsForms_2
 					this.Location.X - chooseFont.Width,
 					100
 				);
+			// Initialize the alarms form
+			alarmsForm = new AlarmsForm();
+			alarmsForm.FormClosed += AlarmsForm_FormClosed;
+
+			// Set up timer for alarms
+			Timer alarmTimer = new Timer();
+			alarmTimer.Interval = 1000;  // Check every second
+			alarmTimer.Tick += AlarmTimer_Tick;
+			alarmTimer.Start();
+
 			LoadSettings();
+		}
+
+		private void AlarmsForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			// Handle the alarms form closed event, cleanup or re-initialize as needed
+			alarmsForm = null; // This is important
+		}
+
+		private void AlarmTimer_Tick(object sender, EventArgs e)
+		{
+			CheckAlarms();
+		}
+
+		private void CheckAlarms()
+		{
+			if (alarmsForm != null) // check if form exists
+			{
+				DateTime now = DateTime.Now;
+
+				foreach (Alarm alarm in alarmsForm.Alarms)
+				{
+					if (alarm.IsEnabled && now >= alarm.AlarmTime)
+					{
+						PlayAlarmSound(alarm.SoundPath);
+						alarm.IsEnabled = false; // Disable Alarm
+					}
+				}
+
+				alarmsForm.RefreshDataGridView(); // Refresh the DataGridView on the AlarmsForm
+			}
+		}
+
+		private void PlayAlarmSound(string soundPath)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(soundPath) || !File.Exists(soundPath))
+				{
+					SystemSounds.Asterisk.Play(); // Default sound
+				}
+				else
+				{
+					SoundPlayer player = new SoundPlayer(soundPath);
+					player.Play();
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Error playing sound: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				SystemSounds.Asterisk.Play(); // Play default sound
+			}
 		}
 
 		void ShowControls(bool visible)
@@ -196,6 +259,19 @@ namespace WindowsForms_2
 			);
 			chooseFont.ShowDialog();
 			labelCurrentTime.Font = chooseFont.Font;
+		}
+
+		//Alarms click event
+		private void cmAlarms_Click(object sender, EventArgs e)
+		{
+			// Ensure the alarms form is not null or disposed
+			if (alarmsForm == null || alarmsForm.IsDisposed)
+			{
+				alarmsForm = new AlarmsForm();
+				alarmsForm.FormClosed += AlarmsForm_FormClosed;
+			}
+			alarmsForm.Show();  // Show form
+			alarmsForm.Activate(); // Bring to front
 		}
 
 		private void cmLoadOnWindowsStartup_CheckedChanged(object sender, EventArgs e)

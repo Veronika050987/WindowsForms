@@ -39,6 +39,7 @@ namespace WindowsForms_2
 					this.Location.X - chooseFont.Width,
 					100
 				);
+			LoadSettings();
 		}
 
 		void ShowControls(bool visible)
@@ -62,6 +63,47 @@ namespace WindowsForms_2
 				FreeConsole();
 		}
 
+		void SaveSettings()
+		{
+			StreamWriter settings = new StreamWriter("Settings.ini");
+
+			settings.WriteLine($"{this.Location.X}x{this.Location.Y}");	//1. Location
+			settings.WriteLine(cmTopmost.Checked);						//2. Topmost
+			settings.WriteLine(cmShowControls.Checked);					//3.
+			settings.WriteLine(cmDebugConsole.Checked);					//4.
+			settings.WriteLine(cmShowDate.Checked);						//5.
+			settings.WriteLine(cmShowWeekday.Checked);					//6.
+			settings.WriteLine(cmLoadOnWindowsStartup.Checked);			//7.
+			settings.WriteLine(cdBackColor.Color.ToArgb());				//8.
+			settings.WriteLine(cdForeColor.Color.ToArgb());				//9.
+			settings.WriteLine(chooseFont.Filename);					//10.
+			settings.Close();
+		}
+		void LoadSettings()
+		{
+			StreamReader settings = new StreamReader("Settings.ini");			
+			string location = settings.ReadLine();							//1. Location
+			this.Location = new Point
+				(
+					Convert.ToInt32(location.Split('x').First()),
+					Convert.ToInt32(location.Split('x').Last())
+
+				);
+
+			cmTopmost.Checked = bool.Parse(settings.ReadLine());			//2.
+			cmShowControls.Checked = bool.Parse(settings.ReadLine());		//3.
+			cmDebugConsole.Checked = bool.Parse(settings.ReadLine());		//4.
+			cmShowDate.Checked = bool.Parse(settings.ReadLine());			//5.
+			cmShowWeekday.Checked = bool.Parse(settings.ReadLine());		//6.
+			cmLoadOnWindowsStartup.Checked = bool.Parse(settings.ReadLine());//7.
+			cdBackColor.Color = labelCurrentTime.BackColor = Color.FromArgb(Convert.ToInt32(settings.ReadLine()));//8.
+			cdForeColor.Color = labelCurrentTime.ForeColor = Color.FromArgb(Convert.ToInt32(settings.ReadLine()));//9.
+			string font_name = settings.ReadLine();											  //10.
+			chooseFont = new ChooseFont(this, font_name, 32);
+			labelCurrentTime.Font = chooseFont.Font;				
+			settings.Close();
+		}
+
 		private void timer_Tick(object sender, EventArgs e)
 		{
 			labelCurrentTime.Text = DateTime.Now.ToString("hh:mm:ss tt", CultureInfo.InvariantCulture);
@@ -75,7 +117,7 @@ namespace WindowsForms_2
 
 			notifyIcon.Text = labelCurrentTime.Text;
 			//if(cmDebugConsole.Checked) Console.WriteLine(notifyIcon.Text);
-		}
+		}		
 
 		private void btnHideControls_Click(object sender, EventArgs e)
 		{
@@ -158,10 +200,15 @@ namespace WindowsForms_2
 		private void cmLoadOnWindowsStartup_CheckedChanged(object sender, EventArgs e)
 		{
 			string key_name = "Clock_PD411";
-			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);//opens brahcn for writing
+			RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);//opens branch for writing
 			if (cmLoadOnWindowsStartup.Checked) key.SetValue(key_name, Application.ExecutablePath);
 			else key.DeleteValue(key_name, false);//no exeptions if there is no key
 			key.Dispose();
+		}
+
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			SaveSettings();
 		}
 	}
 }

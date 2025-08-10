@@ -245,6 +245,7 @@
 			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
 			this.Text = "Clock";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.cmMainMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
